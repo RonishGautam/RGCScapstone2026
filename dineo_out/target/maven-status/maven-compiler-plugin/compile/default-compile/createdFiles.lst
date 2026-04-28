@@ -1,0 +1,14 @@
+com/dineo/Ingredient.class
+com/dineo/DataSeeder.class
+com/dineo/MenuItemRequest.class
+com/dineo/Category.class
+com/dineo/DineoApplication.class
+com/dineo/WebConfig.class
+com/dineo/MenuItem.class
+com/dineo/IngredientController.class
+com/dineo/IngredientRepository.class
+com/dineo/CategoryRepository.class
+com/dineo/DashboardController.class
+com/dineo/CategoryController.class
+com/dineo/MenuItemController.class
+com/dineo/MenuItemRepository.class

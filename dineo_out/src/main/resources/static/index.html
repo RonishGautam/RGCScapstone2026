@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dineo - Restaurant Manager</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand">
+    <h1>Dineo</h1>
+    <p>Restaurant Manager</p>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)">
+      Dashboard
+    </div>
+    <div class="nav-item" data-page="menu" onclick="showPage('menu',this)">
+      Menu Items
+      <span class="nav-badge" id="badge-oos">0</span>
+    </div>
+    <div class="nav-item" data-page="inventory" onclick="showPage('inventory',this)">
+      Inventory
+      <span class="nav-badge" id="badge-low">0</span>
+    </div>
+    <div class="sb-section">Kitchen</div>
+    <div class="nav-item" data-page="ingredients" onclick="showPage('ingredients',this)">
+      Ingredients
+      <span class="nav-badge" id="badge-ing">0</span>
+    </div>
+    <div class="sb-section">Public</div>
+    <a class="nav-item" href="/menu.html" target="_blank" style="text-decoration:none">
+      Customer Menu
+    </a>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div>
+      <button class="btn-primary" id="add-btn" style="display:none" onclick="openAddModal()">+ Add Item</button>
+      <button class="btn-primary" id="add-ing-btn" style="display:none" onclick="openIngModal()">+ Add Ingredient</button>
+    </div>
+  </div>
+
+  <!-- dashboard -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card" style="--accent:#3b82f6"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total Items</div></div>
+      <div class="stat-card" style="--accent:#22c55e"><div class="stat-val" id="s-avail">0</div><div class="stat-lbl">Available</div></div>
+      <div class="stat-card" style="--accent:#ef4444"><div class="stat-val" id="s-oos">0</div><div class="stat-lbl">Out of Stock</div></div>
+      <div class="stat-card" style="--accent:#06b6d4"><div class="stat-val" id="s-ing-total">0</div><div class="stat-lbl">Total Ingredients</div></div>
+      <div class="stat-card" style="--accent:#f59e0b"><div class="stat-val" id="s-ings">0</div><div class="stat-lbl">Low / Out Ingredients</div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-header"><h3>Recent Menu Items</h3></div>
+        <table>
+          <thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Status</th></tr></thead>
+          <tbody id="dash-items"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>By Category</h3></div>
+        <div id="dash-cats"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div class="card-header">
+        <h3>Ingredients Status</h3>
+        <button class="btn-ghost" onclick="showPage('ingredients', document.querySelector('[data-page=ingredients]'))">View All</button>
+      </div>
+      <table>
+        <thead><tr><th>Ingredient</th><th>Unit</th><th>Quantity</th><th>Threshold</th><th>Stock Level</th><th>Status</th></tr></thead>
+        <tbody id="dash-ings"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- menu items -->
+  <div class="page" id="page-menu">
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="setMenuFilter('all',this)">All</button>
+          <button class="ftab" onclick="setMenuFilter('available',this)">Available</button>
+          <button class="ftab" onclick="setMenuFilter('out',this)">Out of Stock</button>
+        </div>
+        <span class="tbl-count" id="menu-count"></span>
+        <div class="search-box">
+          <input type="text" placeholder="Search items..." oninput="renderMenu()" id="menu-search"/>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Item</th><th>Category</th><th>Ingredients</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="menu-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- inventory -->
+  <div class="page" id="page-inventory">
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="setInvFilter('all',this)">All</button>
+          <button class="ftab" onclick="setInvFilter('low',this)">Low Stock</button>
+          <button class="ftab" onclick="setInvFilter('out',this)">Out of Stock</button>
+        </div>
+        <div class="search-box">
+          <input type="text" placeholder="Search..." oninput="renderInventory()" id="inv-search"/>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Item</th><th>Category</th><th>Quantity</th><th>Threshold</th><th>Stock Level</th><th>Status</th></tr></thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ingredients -->
+  <div class="page" id="page-ingredients">
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="setIngFilter('all',this)">All</button>
+          <button class="ftab" onclick="setIngFilter('low',this)">Low Stock</button>
+          <button class="ftab" onclick="setIngFilter('out',this)">Out of Stock</button>
+        </div>
+        <span class="tbl-count" id="ing-count"></span>
+        <div class="search-box">
+          <input type="text" placeholder="Search ingredients..." oninput="renderIngredients()" id="ing-search"/>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Ingredient</th><th>Unit</th><th>Quantity</th><th>Threshold</th><th>Stock Level</th><th>Status</th><th>Used In</th><th>Actions</th></tr></thead>
+        <tbody id="ing-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- menu item modal -->
+<div class="modal-overlay" id="item-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="item-modal-title">Add Menu Item</h3>
+      <button class="modal-close" onclick="closeItemModal()">X</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-id"/>
+      <div>
+        <div class="f-label">Name *</div>
+        <input class="f-input" type="text" id="f-name" placeholder="e.g. Caesar Salad"/>
+      </div>
+      <div class="f-row">
+        <div>
+          <div class="f-label">Price ($) *</div>
+          <input class="f-input" type="number" id="f-price" placeholder="0.00" min="0" step="0.01"/>
+        </div>
+        <div>
+          <div class="f-label">Category *</div>
+          <select class="f-input" id="f-category"></select>
+        </div>
+      </div>
+      <div>
+        <div class="f-label">Allergens</div>
+        <input class="f-input" type="text" id="f-allergens" placeholder="e.g. gluten, dairy"/>
+      </div>
+      <div>
+        <div class="f-label">Image URL</div>
+        <input class="f-input" type="text" id="f-image" placeholder="https://..."/>
+      </div>
+      <div class="f-row">
+        <div>
+          <div class="f-label">Stock Quantity</div>
+          <input class="f-input" type="number" id="f-stock" placeholder="20" min="0"/>
+        </div>
+        <div>
+          <div class="f-label">Low Stock Warning At</div>
+          <input class="f-input" type="number" id="f-threshold" placeholder="5" min="1"/>
+        </div>
+      </div>
+      <div>
+        <div class="f-label">Linked Ingredients</div>
+        <div class="ing-selector">
+          <div class="ing-selector-search">
+            <input type="text" placeholder="Search ingredients..." oninput="filterIngSelector(this.value)" id="ing-selector-search"/>
+          </div>
+          <div class="ing-list" id="ing-checklist"></div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="f-label" style="margin-bottom:4px">Selected:</div>
+          <div class="ing-selected-tags" id="ing-selected-tags">
+            <span style="font-size:12px;color:#94a3b8">None selected</span>
+          </div>
+        </div>
+      </div>
+      <div class="f-error" id="item-error">Please fill in Name, Price, and Category.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeItemModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ingredient modal -->
+<div class="modal-overlay" id="ing-modal">
+  <div class="modal" style="width:400px">
+    <div class="modal-head">
+      <h3 id="ing-modal-title">Add Ingredient</h3>
+      <button class="modal-close" onclick="closeIngModal()">X</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ing-id"/>
+      <div>
+        <div class="f-label">Name *</div>
+        <input class="f-input" type="text" id="ing-name" placeholder="e.g. Mozzarella Cheese"/>
+      </div>
+      <div class="f-row">
+        <div>
+          <div class="f-label">Quantity *</div>
+          <input class="f-input" type="number" id="ing-qty" placeholder="0" min="0" step="0.01"/>
+        </div>
+        <div>
+          <div class="f-label">Unit *</div>
+          <select class="f-input" id="ing-unit">
+            <option value="g">g (grams)</option>
+            <option value="kg">kg</option>
+            <option value="ml">ml</option>
+            <option value="l">liters</option>
+            <option value="units">units</option>
+            <option value="bottles">bottles</option>
+            <option value="cups">cups</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="f-label">Low Stock Warning At</div>
+        <input class="f-input" type="number" id="ing-threshold" placeholder="e.g. 200" min="0" step="0.01"/>
+      </div>
+      <div class="f-error" id="ing-error">Please fill in Name, Quantity, and Unit.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeIngModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveIngredient()">Save Ingredient</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
